@@ -56,3 +56,10 @@ main>.home-content{position:relative;z-index:2;width:100%;max-width:none;margin:
 
 /* Translate both text lines together; leave the photograph untouched. */
 .hero-copy{transform:translateY(calc(-1 * var(--hero-text-shift,0px)))}
+
+/* Catalogue availability is independent of the model description. */
+.availability-note{font:16px/1.7 Georgia,serif;color:#756958;max-width:790px;margin:22px 0 0}
+.signature-caption .model-availability,.detail-copy .model-availability{font:13px/1.6 Arial,sans-serif;color:var(--red);font-style:normal;margin:12px 0}
+.detail-copy>p.availability-note{font:12.5px/1.55 Arial,sans-serif;color:#81786b;letter-spacing:0;margin:10px 0 18px;max-width:440px}
+
+.detail-copy>p.model-evolution{font:italic 19px/1.5 Georgia,serif;color:var(--red);margin:18px 0 24px}
