@@ -63,3 +63,23 @@ main>.home-content{position:relative;z-index:2;width:100%;max-width:none;margin:
 .detail-copy>p.availability-note{font:12.5px/1.55 Arial,sans-serif;color:#81786b;letter-spacing:0;margin:10px 0 18px;max-width:440px}
 
 .detail-copy>p.model-evolution{font:italic 19px/1.5 Georgia,serif;color:var(--red);margin:18px 0 24px}
+
+.providers-page{max-width:1440px}
+.dealer-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;margin-top:55px}
+.dealer-card{display:flex;align-items:center;justify-content:center;min-width:0;min-height:200px;padding:25px;background:#fff;border:1px solid #ded8cc;border-radius:4px;transition:border-color .15s}
+.dealer-card:hover{border-color:var(--gold)}
+.dealer-logo{display:flex;align-items:center;justify-content:center;width:100%;height:140px;max-width:280px;padding:8px}
+.dealer-logo img{display:block;width:100%;height:100%;object-fit:contain}
+.dealer-logo-light{background:#84745f;border-radius:4px;padding:16px}
+@media(max-width:1000px){.dealer-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}.dealer-card{padding:22px}}
+@media(max-width:600px){.dealer-grid{grid-template-columns:1fr;gap:18px;margin-top:35px}.dealer-card{min-height:170px;padding:20px}.dealer-logo{height:125px;max-width:260px}}
+@media(prefers-reduced-motion:reduce){.dealer-card{transition:none}}
+
+/* More restrained scale on the points-of-sale page. */
+.providers-page h1{font-size:clamp(28px,3vw,40px);line-height:1.2;letter-spacing:-.7px}
+.dealer-grid{max-width:1000px;margin-top:35px;gap:20px}
+.dealer-card{min-height:140px;padding:18px}
+.dealer-logo{max-width:190px;height:95px;padding:8px}
+.dealer-logo-light{padding:12px}
+@media(max-width:1000px){.dealer-grid{max-width:720px;gap:18px}.dealer-card{padding:18px}}
+@media(max-width:600px){.providers-page h1{font-size:28px}.dealer-grid{max-width:340px;margin-top:28px;gap:14px}.dealer-card{min-height:120px;padding:15px}.dealer-logo{max-width:175px;height:85px}}
