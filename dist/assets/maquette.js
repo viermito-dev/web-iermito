@@ -1,16 +1,17 @@
 // Focused changes to the existing version 9 maquette.
 const providerCopy = {
-  es: {nav:'Proveedores', title:'Dónde encontrar mis guitarras.', note:'Listado de proveedores pendiente de completar.', back:'Inicio'},
-  fr: {nav:'Revendeurs', title:'Où trouver mes guitares.', note:'La liste des revendeurs reste à compléter.', back:'Accueil'},
-  en: {nav:'Dealers', title:'Where to find my guitars.', note:'The dealer list is yet to be added.', back:'Home'}
+  es:{nav:'Puntos de venta',title:'Dónde encontrar mis guitarras',back:'Inicio'},
+  fr:{nav:'Points de vente',title:'Où trouver mes guitares',back:'Accueil'},
+  en:{nav:'Dealers',title:'Where to find my guitars',back:'Home'}
 };
+const dealers=[{"name": "La Guitarrería de París", "url": "https://www.laguitarreriadeparis.com/", "image": "assets/dealers/guitarreria-paris.png", "lightLogo": false}, {"name": "Casa Luthier", "url": "https://casaluthier.com/es/", "image": "assets/dealers/casa-luthier.png", "lightLogo": false}, {"name": "London Guitar Studio", "url": "https://www.londonguitarstudio.com/", "image": "assets/dealers/london-guitar-studio.png", "lightLogo": false}, {"name": "Salotto", "url": "https://www.salotto-kyoto.com/top", "image": "assets/dealers/salotto.png", "lightLogo": false}, {"name": "Larghetto", "url": "https://www.larghetto.eu/", "image": "assets/dealers/larghetto.png", "lightLogo": true}, {"name": "Vincenti Guitares", "url": "https://www.vincenti-guitares.com/", "image": "assets/dealers/vincenti-guitares.png", "lightLogo": false}, {"name": "Guitarras de Luthier", "url": "https://www.guitarrasdeluthier.com/", "image": "assets/dealers/guitarras-de-luthier.png", "lightLogo": false}];
 function renderProviders(){
   const c=providerCopy[lang];
-  main.innerHTML=`<section class="practical-page providers-page"><a class="breadcrumbs" href="#/">← ${c.back}</a><p class="eyebrow">${c.nav}</p><h1>${c.title}</h1><p class="practical-lead">${c.note}</p></section>`;
+  main.innerHTML=`<section class="practical-page providers-page"><a class="breadcrumbs" href="#/">← ${c.back}</a><p class="eyebrow">${c.nav}</p><h1>${c.title}</h1><div class="dealer-grid">${dealers.map(d=>`<a class="dealer-card" href="${d.url}" target="_blank" rel="noopener" aria-label="${d.name}" title="${d.name}"><span class="dealer-logo${d.lightLogo?' dealer-logo-light':''}"><img src="${d.image}" alt="${d.name}" loading="lazy"></span></a>`).join('')}</div></section>`;
   applyLanguage();
 }
 updateNav=function(){
-  const labels={es:['Guitarras','Tu guitarra','Proveedores','Contacto'],fr:['Guitares','Votre guitare','Revendeurs','Contact'],en:['Guitars','Your guitar','Dealers','Contact']}[lang];
+  const labels={es:['Guitarras','Tu guitarra',providerCopy.es.nav,'Contacto'],fr:['Guitares','Votre guitare',providerCopy.fr.nav,'Contact'],en:['Guitars','Your guitar','Dealers','Contact']}[lang];
   const nav=document.querySelector('header nav');
   nav.innerHTML=`<a href="#/guitars">${labels[0]}</a><a href="#passport">${labels[1]}</a><a href="#/providers">${labels[2]}</a><details class="contact-menu"><summary>${labels[3]}</summary><div class="contact-submenu"><a href="#contact">${labels[3]}</a><a href="#/order">${practical[lang].order}</a></div></details>`;
   document.querySelector('.brand').href='#/';
