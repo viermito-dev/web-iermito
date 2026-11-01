@@ -1,3 +1,4 @@
+const detailPhotos=['session-1.jpg','session-2.jpg','real-rosette.jpg','real-top.jpg','real-front.jpg','real-overview.jpg'];
 // Focused changes to the existing version 9 maquette.
 const providerCopy = {
   es:{nav:'Puntos de venta',title:'Dónde encontrar mis guitarras',back:'Inicio'},
@@ -30,12 +31,14 @@ renderHome=function(){
   homeBeforePhotoUpdate();
   const atelierLabel=document.querySelector('.atelier .eyebrow');
   atelierLabel.removeAttribute('data-i');atelierLabel.textContent=historyCopy[lang].nav;
+  document.querySelectorAll('a[href="#details"]').forEach(a=>a.href='#/details');
   const detailSection=document.querySelector('.detail-story');
   detailSection.querySelector('h2').innerHTML=`<a href="#/details">${ed().detail}</a>`;
   detailSection.querySelectorAll('img').forEach(img=>{const a=document.createElement('a');a.href='#/details';img.replaceWith(a);a.append(img)});
   detailSection.insertAdjacentHTML('beforeend',`<a class="text-link details-access" href="#/details">${{es:'Ver todos los detalles',fr:'Voir tous les détails',en:'View all details'}[lang]} →</a>`);
   const allModelsLabel={es:'Ver todos los modelos',fr:'Voir tous les modèles',en:'View all models'}[lang];
   document.querySelector('.signature-grid').insertAdjacentHTML('afterend',`<div class="all-models-link"><a class="custom-button" href="#/guitars">${allModelsLabel} →</a></div>`);
+  document.querySelectorAll('.atelier .text-link,.history-teaser .text-link,.eco-editorial .text-link,.details-access').forEach(a=>{a.classList.remove('text-link');a.classList.add('custom-button','home-section-button')});
   const photo=document.querySelector('.hero-photo img');
   photo.src='assets/real/real-top.jpg';
   photo.alt={es:'Guitarra real de Víctor Iermito: tapa de cedro y roseta original',fr:'Guitare de Victor Iermito : table en cèdre et rosace originale',en:'Victor Iermito guitar: cedar soundboard and original rosette'}[lang];
@@ -84,7 +87,7 @@ pressPhotoDialog.className='press-photo-dialog';
 pressPhotoDialog.innerHTML='<div class="press-photo-view"><button type="button" class="photo-close"></button><img alt=""></div>';
 document.body.append(pressPhotoDialog);
 pressPhotoDialog.querySelector('button').onclick=()=>pressPhotoDialog.close();
-pressPhotoDialog.addEventListener('click',()=>pressPhotoDialog.close());
+pressPhotoDialog.addEventListener('click',e=>{if(e.target===pressPhotoDialog)pressPhotoDialog.close()});
 pressPhotoDialog.addEventListener('close',()=>document.documentElement.classList.remove('press-view-open'));
 document.addEventListener('click',e=>{
  const trigger=e.target.closest('button[data-enlarge]');
@@ -102,11 +105,52 @@ new ResizeObserver(measureHeader).observe(document.querySelector('header'));
 route();
 measureHeader();
 
-const detailPhotos=['session-1.jpg','session-2.jpg','real-rosette.jpg','real-top.jpg','real-front.jpg','real-overview.jpg'];
 function renderDetails(){
  const c={es:{title:'Detalles',home:'Inicio',photo:'Detalle de una guitarra de Víctor Iermito'},fr:{title:'Détails',home:'Accueil',photo:'Détail d’une guitare de Victor Iermito'},en:{title:'Details',home:'Home',photo:'Detail of a Victor Iermito guitar'}}[lang];
  main.innerHTML=`<section class="details-page practical-page"><a class="breadcrumbs" href="#/">${c.home} / ${c.title}</a><h1>${c.title}</h1><div class="details-gallery">${detailPhotos.map((file,i)=>`<button type="button" class="press-photo-button" data-enlarge="assets/real/${file}" data-photo-alt="${c.photo} · ${i+1}" aria-label="${pressMediaCopy[lang].enlarge}: ${c.photo} · ${i+1}"><img src="assets/real/${file}" alt="${c.photo} · ${i+1}" loading="lazy"></button>`).join('')}</div></section>`;applyLanguage();
 }
-const routeBeforeDetails=route;
-route=function(){if(location.hash==='#/details'){renderDetails();updateNav();window.scrollTo(0,0)}else routeBeforeDetails()};
-if(location.hash==='#/details')route();
+
+// Hover magnifier uses the original image, including its contained-image bounds.
+const photoView=pressPhotoDialog.querySelector('.press-photo-view');
+const fullPhoto=photoView.querySelector('img');
+const photoLens=document.createElement('span');photoLens.className='photo-lens';photoLens.setAttribute('aria-hidden','true');photoView.append(photoLens);
+let photoScale=1,photoX=0,photoY=0;
+const photoPointers=new Map();let pinchStart=null;
+function photoTransform(){fullPhoto.style.transform=`translate(${photoX}px,${photoY}px) scale(${photoScale})`}
+function resetPhotoZoom(){photoScale=1;photoX=0;photoY=0;photoPointers.clear();pinchStart=null;photoTransform();photoLens.hidden=true}
+photoLens.hidden=true;
+pressPhotoDialog.addEventListener('close',resetPhotoZoom);
+document.addEventListener('click',e=>{if(e.target.closest('button[data-enlarge]'))resetPhotoZoom()});
+photoView.addEventListener('pointermove',e=>{
+ if(e.pointerType!=='mouse'||!matchMedia('(hover:hover) and (pointer:fine)').matches)return;
+ const r=photoView.getBoundingClientRect();
+ const factor=Math.min(r.width/fullPhoto.naturalWidth,r.height/fullPhoto.naturalHeight);
+ const w=fullPhoto.naturalWidth*factor,h=fullPhoto.naturalHeight*factor;
+ const left=(r.width-w)/2,top=(r.height-h)/2,x=e.clientX-r.left,y=e.clientY-r.top;
+ if(!w||x<left||x>left+w||y<top||y>top+h||e.target.closest('button')){photoLens.hidden=true;return}
+ const size=Math.min(200,r.width*.32),zoom=2.5;
+ photoLens.hidden=false;photoLens.style.width=photoLens.style.height=size+'px';
+ photoLens.style.left=(x-size/2)+'px';photoLens.style.top=(y-size/2)+'px';
+ photoLens.style.backgroundImage=`url("${fullPhoto.src}")`;
+ photoLens.style.backgroundSize=`${w*zoom}px ${h*zoom}px`;
+ photoLens.style.backgroundPosition=`${size/2-(x-left)*zoom}px ${size/2-(y-top)*zoom}px`;
+});
+photoView.addEventListener('pointerleave',()=>photoLens.hidden=true);
+function touchSnapshot(){const a=[...photoPointers.values()];return {x:a.reduce((s,p)=>s+p.x,0)/a.length,y:a.reduce((s,p)=>s+p.y,0)/a.length,d:a.length>1?Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y):0}}
+photoView.addEventListener('pointerdown',e=>{
+ if(e.pointerType==='mouse'||e.target.closest('button'))return;
+ e.preventDefault();photoView.setPointerCapture(e.pointerId);photoPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ pinchStart={...touchSnapshot(),scale:photoScale,tx:photoX,ty:photoY};
+});
+photoView.addEventListener('pointermove',e=>{
+ if(!photoPointers.has(e.pointerId)||!pinchStart)return;
+ e.preventDefault();photoPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});const now=touchSnapshot();
+ photoScale=now.d&&pinchStart.d?Math.max(1,Math.min(5,pinchStart.scale*now.d/pinchStart.d)):photoScale;
+ const r=photoView.getBoundingClientRect(),ratio=photoScale/pinchStart.scale;
+ photoX=ratio*pinchStart.tx+(now.x-r.left-r.width/2)-ratio*(pinchStart.x-r.left-r.width/2);
+ photoY=ratio*pinchStart.ty+(now.y-r.top-r.height/2)-ratio*(pinchStart.y-r.top-r.height/2);
+ photoX=Math.max(-r.width*(photoScale-1)/2,Math.min(r.width*(photoScale-1)/2,photoX));
+ photoY=Math.max(-r.height*(photoScale-1)/2,Math.min(r.height*(photoScale-1)/2,photoY));photoTransform();
+});
+function finishPhotoPointer(e){photoPointers.delete(e.pointerId);pinchStart=photoPointers.size?{...touchSnapshot(),scale:photoScale,tx:photoX,ty:photoY}:null}
+photoView.addEventListener('pointerup',finishPhotoPointer);photoView.addEventListener('pointercancel',finishPhotoPointer);
