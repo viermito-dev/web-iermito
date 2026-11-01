@@ -13,7 +13,7 @@ function renderProviders(){
 updateNav=function(){
   const labels={es:['Guitarras','Tu guitarra',providerCopy.es.nav,'Contacto'],fr:['Guitares','Votre guitare',providerCopy.fr.nav,'Contact'],en:['Guitars','Your guitar','Dealers','Contact']}[lang];
   const nav=document.querySelector('header nav');
-  nav.innerHTML=`<a href="#/guitars">${labels[0]}</a><a href="#passport">${labels[1]}</a><a href="#/providers">${labels[2]}</a><details class="contact-menu"><summary>${labels[3]}</summary><div class="contact-submenu"><a href="#/contact">${labels[3]}</a><a href="#/order">${practical[lang].order}</a></div></details>`;
+  nav.innerHTML=`<a href="#/guitars">${labels[0]}</a><a href="#/press">${historyCopy[lang].nav}</a><a href="#passport">${labels[1]}</a><a href="#/providers">${labels[2]}</a><details class="contact-menu"><summary>${labels[3]}</summary><div class="contact-submenu"><a href="#/contact">${labels[3]}</a><a href="#/order">${practical[lang].order}</a></div></details>`;
   document.querySelector('.brand').href='#/';
   renderPracticalFooter();
 };
@@ -28,6 +28,14 @@ const heroTextObserver=new ResizeObserver(entries=>{
 const homeBeforePhotoUpdate=renderHome;
 renderHome=function(){
   homeBeforePhotoUpdate();
+  const atelierLabel=document.querySelector('.atelier .eyebrow');
+  atelierLabel.removeAttribute('data-i');atelierLabel.textContent=historyCopy[lang].nav;
+  const detailSection=document.querySelector('.detail-story');
+  detailSection.querySelector('h2').innerHTML=`<a href="#/details">${ed().detail}</a>`;
+  detailSection.querySelectorAll('img').forEach(img=>{const a=document.createElement('a');a.href='#/details';img.replaceWith(a);a.append(img)});
+  detailSection.insertAdjacentHTML('beforeend',`<a class="text-link details-access" href="#/details">${{es:'Ver todos los detalles',fr:'Voir tous les détails',en:'View all details'}[lang]} →</a>`);
+  const allModelsLabel={es:'Ver todos los modelos',fr:'Voir tous les modèles',en:'View all models'}[lang];
+  document.querySelector('.signature-grid').insertAdjacentHTML('afterend',`<div class="all-models-link"><a class="custom-button" href="#/guitars">${allModelsLabel} →</a></div>`);
   const photo=document.querySelector('.hero-photo img');
   photo.src='assets/real/real-top.jpg';
   photo.alt={es:'Guitarra real de Víctor Iermito: tapa de cedro y roseta original',fr:'Guitare de Victor Iermito : table en cèdre et rosace originale',en:'Victor Iermito guitar: cedar soundboard and original rosette'}[lang];
@@ -76,13 +84,15 @@ pressPhotoDialog.className='press-photo-dialog';
 pressPhotoDialog.innerHTML='<div class="press-photo-view"><button type="button" class="photo-close"></button><img alt=""></div>';
 document.body.append(pressPhotoDialog);
 pressPhotoDialog.querySelector('button').onclick=()=>pressPhotoDialog.close();
-pressPhotoDialog.addEventListener('click',e=>{if(e.target===pressPhotoDialog)pressPhotoDialog.close()});
+pressPhotoDialog.addEventListener('click',()=>pressPhotoDialog.close());
+pressPhotoDialog.addEventListener('close',()=>document.documentElement.classList.remove('press-view-open'));
 document.addEventListener('click',e=>{
  const trigger=e.target.closest('button[data-enlarge]');
  if(!trigger)return;
  const img=pressPhotoDialog.querySelector('img');img.src=trigger.dataset.enlarge;img.alt=trigger.dataset.photoAlt;
  pressPhotoDialog.querySelector('button').textContent=pressMediaCopy[lang].close+' ×';
  pressPhotoDialog.showModal();
+ document.documentElement.classList.add('press-view-open');
 });
 window.addEventListener('hashchange',()=>{if(pressPhotoDialog.open)pressPhotoDialog.close()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){const menu=document.querySelector('.contact-menu[open]');if(menu){menu.open=false;menu.querySelector('summary').focus()}}});
@@ -91,3 +101,12 @@ const measureHeader=()=>document.documentElement.style.setProperty('--header-hei
 new ResizeObserver(measureHeader).observe(document.querySelector('header'));
 route();
 measureHeader();
+
+const detailPhotos=['session-1.jpg','session-2.jpg','real-rosette.jpg','real-top.jpg','real-front.jpg','real-overview.jpg'];
+function renderDetails(){
+ const c={es:{title:'Detalles',home:'Inicio',photo:'Detalle de una guitarra de Víctor Iermito'},fr:{title:'Détails',home:'Accueil',photo:'Détail d’une guitare de Victor Iermito'},en:{title:'Details',home:'Home',photo:'Detail of a Victor Iermito guitar'}}[lang];
+ main.innerHTML=`<section class="details-page practical-page"><a class="breadcrumbs" href="#/">${c.home} / ${c.title}</a><h1>${c.title}</h1><div class="details-gallery">${detailPhotos.map((file,i)=>`<button type="button" class="press-photo-button" data-enlarge="assets/real/${file}" data-photo-alt="${c.photo} · ${i+1}" aria-label="${pressMediaCopy[lang].enlarge}: ${c.photo} · ${i+1}"><img src="assets/real/${file}" alt="${c.photo} · ${i+1}" loading="lazy"></button>`).join('')}</div></section>`;applyLanguage();
+}
+const routeBeforeDetails=route;
+route=function(){if(location.hash==='#/details'){renderDetails();updateNav();window.scrollTo(0,0)}else routeBeforeDetails()};
+if(location.hash==='#/details')route();

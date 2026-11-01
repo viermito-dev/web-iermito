@@ -112,3 +112,18 @@ main>.home-content{position:relative;z-index:2;width:100%;max-width:none;margin:
 .press-photo-view>img{display:block;max-width:calc(94vw - 26px);max-height:calc(94svh - 60px);width:auto;height:auto;object-fit:contain}
 .photo-close{position:absolute;right:10px;top:3px;min-height:40px;border:0;background:var(--paper);color:var(--red);padding:5px 12px}
 @media(max-width:760px){.diplomatic-story .press-photo-button img{height:auto}.press-photo-view{padding-inline:6px}}
+
+/* Compact recognition images, centered as in the approved preview. */
+.recognition .press-photo-button{max-width:230px;margin:24px auto 10px}
+.recognition a.foundation-logo{display:flex;width:min(245px,100%);height:163px;align-items:center;justify-content:center;margin:24px auto 10px}
+.foundation-logo img{display:block;width:100%;height:auto;max-height:100px;object-fit:contain}
+/* Edge-to-edge image viewer; contain preserves the entire photograph. */
+.press-photo-dialog{position:fixed;inset:0;width:100vw;height:100dvh;max-width:100vw;max-height:100dvh;margin:0;padding:0;border:0;overflow:hidden;background:var(--paper);cursor:zoom-out}
+.press-photo-view{position:relative;width:100%;height:100%;padding:0}
+.press-photo-view>img{display:block;width:100%;height:100%;max-width:none;max-height:none;object-fit:contain}
+.photo-close{z-index:1;top:10px;right:10px;background:var(--paper);cursor:pointer}
+html.press-view-open{overflow:hidden}
+
+.all-models-link{text-align:center;margin:32px 0 0}.all-models-link .custom-button{font-size:14px;padding:15px 24px}
+
+.details-access{display:inline-block;margin-top:24px}.detail-story h2 a{color:inherit;text-decoration:none}.details-page h1{margin-bottom:40px}.details-gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}.details-gallery img{display:block;width:100%;height:330px;object-fit:cover}.details-gallery .press-photo-button{overflow:hidden}@media(max-width:1000px){.details-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:600px){.details-gallery{grid-template-columns:1fr;gap:20px}.details-gallery img{height:350px}}
