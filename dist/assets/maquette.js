@@ -70,6 +70,21 @@ function renderContact(){
   main.innerHTML=`<section class="contact-page practical-page"><a class="breadcrumbs" href="#/">${c.home} / ${c.nav}</a><p class="eyebrow">${c.nav}</p><h1>${c.title}</h1><p class="contact-intro">${c.intro}</p><div class="contact-columns"><div><h2>${c.workshop}</h2><address>103 rue Raspail<br>94700 Maisons-Alfort, ${c.country}</address><p class="appointment-note">${c.appointment}</p></div><div class="contact-direct"><h2>${c.phone}</h2><div class="contact-phone"><a class="whatsapp-link" href="https://wa.me/33688401450" target="_blank" rel="noopener" aria-label="${c.whatsapp}" title="${c.whatsapp}"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="#25D366" d="M16 1.5A14.3 14.3 0 0 0 3.6 22.9L1.5 30.5l7.8-2A14.3 14.3 0 1 0 16 1.5z"/><path fill="none" stroke="white" stroke-width="1.7" d="M16 4.2a11.7 11.7 0 0 0-10 17.8l-1.4 5 5.1-1.3A11.7 11.7 0 1 0 16 4.2z"/><path fill="white" d="M11.3 9.6c-.3-.7-.6-.7-1-.7h-.7c-.4 0-.8.2-1.1.6-.4.4-1.4 1.4-1.4 3.4s1.5 3.9 1.7 4.2c.2.3 2.9 4.5 7.1 6.1 3.5 1.3 4.2 1 5 .9.7-.1 2.4-1 2.7-1.9.3-.9.3-1.6.2-1.8-.1-.2-.4-.3-.9-.5l-2.7-1.3c-.4-.2-.7-.3-1 .2l-1.3 1.5c-.2.3-.5.3-.9.1-1.3-.6-2.4-1.2-3.4-2.3-.8-.9-1.4-1.9-1.6-2.3-.2-.4 0-.6.2-.8l.7-.8c.2-.3.3-.5.4-.8.1-.3.1-.5 0-.8l-1-2.6z"/></svg></a><a href="tel:+33688401450">+33 6 88 40 14 50</a></div><h2>${c.email}</h2><a class="contact-email" href="mailto:info@victoriermito.com">info@victoriermito.com</a></div></div><div class="contact-bottom"><a class="text-link" href="#/order">${practical[lang].order} ↗</a>${social}</div></section>`;
   applyLanguage();
 }
+// Native dialog: keyboard accessible enlargement of the press photographs.
+const pressPhotoDialog=document.createElement('dialog');
+pressPhotoDialog.className='press-photo-dialog';
+pressPhotoDialog.innerHTML='<div class="press-photo-view"><button type="button" class="photo-close"></button><img alt=""></div>';
+document.body.append(pressPhotoDialog);
+pressPhotoDialog.querySelector('button').onclick=()=>pressPhotoDialog.close();
+pressPhotoDialog.addEventListener('click',e=>{if(e.target===pressPhotoDialog)pressPhotoDialog.close()});
+document.addEventListener('click',e=>{
+ const trigger=e.target.closest('button[data-enlarge]');
+ if(!trigger)return;
+ const img=pressPhotoDialog.querySelector('img');img.src=trigger.dataset.enlarge;img.alt=trigger.dataset.photoAlt;
+ pressPhotoDialog.querySelector('button').textContent=pressMediaCopy[lang].close+' ×';
+ pressPhotoDialog.showModal();
+});
+window.addEventListener('hashchange',()=>{if(pressPhotoDialog.open)pressPhotoDialog.close()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){const menu=document.querySelector('.contact-menu[open]');if(menu){menu.open=false;menu.querySelector('summary').focus()}}});
 document.addEventListener('click',e=>{const menu=document.querySelector('.contact-menu[open]');if(menu&&!menu.contains(e.target))menu.open=false;});
 const measureHeader=()=>document.documentElement.style.setProperty('--header-height',document.querySelector('header').getBoundingClientRect().height+'px');
