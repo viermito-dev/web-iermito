@@ -14,7 +14,7 @@ function renderProviders(){
 updateNav=function(){
   const labels={es:['Guitarras','Tu guitarra',providerCopy.es.nav,'Contacto'],fr:['Guitares','Votre guitare',providerCopy.fr.nav,'Contact'],en:['Guitars','Your guitar','Dealers','Contact']}[lang];
   const nav=document.querySelector('header nav');
-  nav.innerHTML=`<a href="#/guitars">${labels[0]}</a><a href="#/press">${historyCopy[lang].nav}</a><a href="#passport">${labels[1]}</a><a href="#/providers">${labels[2]}</a><details class="contact-menu"><summary>${labels[3]}</summary><div class="contact-submenu"><a href="#/contact">${labels[3]}</a><a href="#/order">${practical[lang].order}</a></div></details>`;
+  nav.innerHTML=`<a href="#/guitars">${labels[0]}</a><a href="#/press">${historyCopy[lang].nav}</a><a href="#passport">${labels[1]}</a><a href="#/stock">Stock</a><a href="#/artists">${modelLabels[lang].artists}</a><a href="#/providers">${labels[2]}</a><details class="contact-menu"><summary>${labels[3]}</summary><div class="contact-submenu"><a href="#/contact">${labels[3]}</a><a href="#/order">${practical[lang].order}</a></div></details>`;
   document.querySelector('.brand').href='#/';
   renderPracticalFooter();
 };
@@ -40,7 +40,7 @@ renderHome=function(){
   document.querySelector('.signature-grid').insertAdjacentHTML('afterend',`<div class="all-models-link"><a class="custom-button" href="#/guitars">${allModelsLabel} →</a></div>`);
   document.querySelectorAll('.atelier .text-link,.history-teaser .text-link,.eco-editorial .text-link,.details-access').forEach(a=>{a.classList.remove('text-link');a.classList.add('custom-button','home-section-button')});
   const photo=document.querySelector('.hero-photo img');
-  photo.src='assets/real/real-top.jpg';
+  photo.src='assets/real/IMG_8333.jpg';
   photo.alt={es:'Guitarra real de Víctor Iermito: tapa de cedro y roseta original',fr:'Guitare de Victor Iermito : table en cèdre et rosace originale',en:'Victor Iermito guitar: cedar soundboard and original rosette'}[lang];
   photo.setAttribute('fetchpriority','high');
   const title=document.querySelector('.hero h1');
@@ -102,8 +102,6 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){const menu=document
 document.addEventListener('click',e=>{const menu=document.querySelector('.contact-menu[open]');if(menu&&!menu.contains(e.target))menu.open=false;});
 const measureHeader=()=>document.documentElement.style.setProperty('--header-height',document.querySelector('header').getBoundingClientRect().height+'px');
 new ResizeObserver(measureHeader).observe(document.querySelector('header'));
-route();
-measureHeader();
 
 function renderDetails(){
  const c={es:{title:'Detalles',home:'Inicio',photo:'Detalle de una guitarra de Víctor Iermito'},fr:{title:'Détails',home:'Accueil',photo:'Détail d’une guitare de Victor Iermito'},en:{title:'Details',home:'Home',photo:'Detail of a Victor Iermito guitar'}}[lang];
@@ -154,3 +152,38 @@ photoView.addEventListener('pointermove',e=>{
 });
 function finishPhotoPointer(e){photoPointers.delete(e.pointerId);pinchStart=photoPointers.size?{...touchSnapshot(),scale:photoScale,tx:photoX,ty:photoY}:null}
 photoView.addEventListener('pointerup',finishPhotoPointer);photoView.addEventListener('pointercancel',finishPhotoPointer);
+
+// Update these lists when an instrument becomes available or is sold.
+// Each entry uses a catalog model key and may add a description per language.
+const stockInstruments = { available: [], used: [] };
+const stockCopy = {
+  es: { available: 'Instrumentos disponibles', used: 'Segunda mano', empty: 'Consultame por disponibilidad.', contact: 'Consultar al taller' },
+  fr: { available: 'Instruments disponibles', used: 'Instruments d’occasion', empty: 'Contactez-moi pour connaître les disponibilités.', contact: 'Contacter l’atelier' },
+  en: { available: 'Available instruments', used: 'Pre-owned instruments', empty: 'Please ask about availability.', contact: 'Contact the workshop' }
+};
+function renderStock(){
+  const copy = stockCopy[lang];
+  main.innerHTML = `<section class="practical-page stock-page"><a class="breadcrumbs" href="#/">${tr('back')} / Stock</a><h1>Stock</h1>
+    <div class="stock-sections">${['available','used'].map(group => `<section><h2>${copy[group]}</h2>
+      ${stockInstruments[group].length ? '<ul class="stock-list"></ul>' : `<p>${copy.empty}</p>`}</section>`).join('')}</div>
+    <a class="custom-button" href="#/contact">${copy.contact} →</a></section>`;
+  ['available','used'].forEach((group,index) => {
+    const list = main.querySelectorAll('.stock-sections section')[index].querySelector('ul');
+    stockInstruments[group].forEach(({model, description}) => {
+      const item = document.createElement('li');
+      const link = document.createElement('a');
+      link.href = '#/guitars/' + encodeURIComponent(model);
+      link.textContent = modelName(model);
+      item.append(link);
+      if(description?.[lang]){
+        const note = document.createElement('p');
+        note.textContent = description[lang];
+        item.append(note);
+      }
+      list.append(item);
+    });
+  });
+  applyLanguage();
+}
+route();
+measureHeader();
